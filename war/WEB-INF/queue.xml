@@ -1,0 +1,13 @@
+<queue-entries>
+<!--Change the refresh rate of the default queue to 1/s-->
+  <queue>
+    <name>OrderTaskQueue</name>
+    <rate>5/s</rate>
+  </queue>
+  <queue>
+    <name>MarketDataTaskQueue</name>
+    <rate>5/s</rate>
+  </queue>
+</queue-entries>
+
+

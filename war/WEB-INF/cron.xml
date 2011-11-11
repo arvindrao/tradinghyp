@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+  <cron>
+    <url>/cron/makeMarket.do</url>
+    <description>Market Maker bot</description>
+    <schedule>every 3 minutes</schedule>
+  </cron>
+  <cron>
+    <url>/cron/takeMarket.do</url>
+    <description>Market Taker bot</description>
+    <schedule>every 1 minutes</schedule>
+  </cron>
+</cronentries>
