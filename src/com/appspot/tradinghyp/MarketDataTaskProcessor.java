@@ -1,5 +1,10 @@
 /**
- * 
+ * TRADING HYP - the online day trading simulator
+ * Written in 2011 by Arvind Rao arvindrao.dev@gmail.com
+ * To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. 
+ * This software is distributed without any warranty.
+ * You should have received a copy of the CC0 Public Domain Dedication along with this software. 
+ * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 package com.appspot.tradinghyp;
 
@@ -23,13 +28,13 @@ import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheManager;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * @author Arvind Rao
  *
+ * Send market data update to user(s) using the cache (if available), or the datastore
  */
 
 @SuppressWarnings("serial")
@@ -46,8 +51,6 @@ public class MarketDataTaskProcessor extends HttpServlet {
 		
 		Map props =null;
 		try{
-			//log.info("Market Data Task Processor:"+symbol+";"+reloadCache);
-
 			CacheManager mcacheMgr = CacheManager.getInstance();
 
 			Cache mktDataCache=mcacheMgr.getCache("MarketDataCache");
@@ -292,11 +295,9 @@ public class MarketDataTaskProcessor extends HttpServlet {
 			
 		}
 		catch (CacheException e) {
-			// TODO Auto-generated catch block
 			log.log(Level.SEVERE, "EXCEPTION", e);
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			log.log(Level.SEVERE, "EXCEPTION", e);
 		}		
 	}

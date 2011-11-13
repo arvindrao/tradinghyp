@@ -1,5 +1,10 @@
 /**
- * 
+ * TRADING HYP - the online day trading simulator
+ * Written in 2011 by Arvind Rao arvindrao.dev@gmail.com
+ * To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. 
+ * This software is distributed without any warranty.
+ * You should have received a copy of the CC0 Public Domain Dedication along with this software. 
+ * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 package com.appspot.tradinghyp;
 
@@ -23,17 +28,18 @@ import com.google.appengine.api.channel.*;
 import java.text.DecimalFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  * @author Arvind Rao
- *
+ * 
+ * Process cancel order requests
  */
-
 @SuppressWarnings("serial")
 public class CancelOrderTaskProcessor extends HttpServlet {
 	private static final Logger log = Logger.getLogger(CancelOrderTaskProcessor.class.getName());
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		//System.out.println("CancelOrderTaskProcessor: BEGIN");
+		log.info("BEGIN");
 
 		String symbol=req.getParameter("symbol");
 		String traderId=req.getParameter("traderId");
@@ -151,7 +157,7 @@ public class CancelOrderTaskProcessor extends HttpServlet {
 				ChannelService chService=ChannelServiceFactory.getChannelService();
 				//Send order update to party
 				chService.sendMessage(new ChannelMessage(traderId,orderData));
-				//System.out.println("TraderId:"+traderId+" Message:"+orderData);
+				//log.info("TraderId:"+traderId+" Message:"+orderData);
 				txn.commit();
 
 				//update market data
@@ -188,7 +194,7 @@ public class CancelOrderTaskProcessor extends HttpServlet {
 				}
 			}
 		}
-		//System.out.println("CancelOrderTaskProcessor: END");
+		log.info("END");
 	}
 }
 

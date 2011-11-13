@@ -1,5 +1,10 @@
 /**
- * 
+ * TRADING HYP - the online day trading simulator
+ * Written in 2011 by Arvind Rao arvindrao.dev@gmail.com
+ * To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. 
+ * This software is distributed without any warranty.
+ * You should have received a copy of the CC0 Public Domain Dedication along with this software. 
+ * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 package com.appspot.tradinghyp;
 
@@ -16,14 +21,13 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheManager;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 
  * @author Arvind Rao
  *
+ * Make a market by placing a quote around the last trade price 
  */
 
 @SuppressWarnings("serial")

@@ -1,5 +1,10 @@
 /**
- * 
+ * TRADING HYP - the online day trading simulator
+ * Written in 2011 by Arvind Rao arvindrao.dev@gmail.com
+ * To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to this software to the public domain worldwide. 
+ * This software is distributed without any warranty.
+ * You should have received a copy of the CC0 Public Domain Dedication along with this software. 
+ * If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 package com.appspot.tradinghyp;
 
@@ -17,13 +22,12 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
- * 
  * @author Arvind Rao
- *
+ * 
+ * Initalize new user connections
  */
 
 @SuppressWarnings("serial")
@@ -115,7 +119,6 @@ public class ConnectionInitializer extends HttpServlet {
 			log.info("New traderId "+traderId.toString());
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			connResponse.append("\"N\"}");
 			log.log(Level.SEVERE, "EXCEPTION", e);
 		}
