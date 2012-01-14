@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.appspot.tradinghyp.TradeStats" table="TradeStats" schema="TradingHyp">
+        <id name="tradeStatsId" type="long" unsaved-value="0">
+            <column name="TradeStatsId" />
+            <generator class="assigned" />
+        </id>
+        <property name="closePrice" type="long">
+            <column name="ClosePrice"  />
+        </property>
+        <property name="openPrice" type="long">
+            <column name="OpenPrice"  />
+        </property>
+        <property name="highPrice" type="long">
+            <column name="HighPrice"  />
+        </property>
+        <property name="lowPrice" type="long">
+            <column name="LowPrice"  />
+        </property>
+        <property name="lastPrice" type="long">
+            <column name="LastPrice"  />
+        </property>
+        <property name="lastVolume" type="long">
+            <column name="LastVolume"  />
+        </property>
+        <property name="changeFromClose" type="long">
+            <column name="ChangeFromClose"  />
+        </property>
+        <property name="changeFromClosePercent" type="long">
+            <column name="ChangeFromClosePercent"  />
+        </property>
+        <property name="dayValue" type="long">
+            <column name="DayValue"  />
+        </property>
+        <property name="dayVolume" type="long">
+            <column name="DayVolume"  />
+        </property>
+    </class>
+    
+</hibernate-mapping>

@@ -9,8 +9,8 @@
 
 <script type="text/javascript" src="/_ah/channel/jsapi"></script>
 <script type="text/javascript">
-var userId="";
-var traderId="-";
+var userName="";
+var userId="-";
 var channel;
 var handler;
 var socket;
@@ -108,11 +108,11 @@ function updateTradeStats(){
 }
 
 function updatePositions(myScore){
-	realizedGain=myScore.realizedGain;
+	realizedGain=myScore.realizedGain/100;
 	longPosition=myScore.longPosition;
-	longAvgPx=myScore.longAvgPrice;
+	longAvgPx=myScore.longAvgPrice/100;
 	shortPosition=myScore.shortPosition;
-	shortAvgPx=myScore.shortAvgPrice;
+	shortAvgPx=myScore.shortAvgPrice/100;
 	
 	if (realizedGain>=0){
 		document.getElementById("myRealizedGain").style.color='#70D400';
@@ -160,9 +160,9 @@ chMessage=function(msg){
 	var a;
 	if (msgData.type=="MKTDATA"){
 		for (a=0;a<msgData.bid.length;a++){
-			document.getElementById("bidPrice"+a).innerHTML=msgData.bid[a].price.toFixed(2);
+			document.getElementById("bidPrice"+a).innerHTML=(msgData.bid[a].price/100).toFixed(2);
 			document.getElementById("bidVol"+a).innerHTML=msgData.bid[a].vol;
-			document.getElementById("askPrice"+a).innerHTML=msgData.ask[a].price.toFixed(2);
+			document.getElementById("askPrice"+a).innerHTML=(msgData.ask[a].price/100).toFixed(2);
 			document.getElementById("askVol"+a).innerHTML=msgData.ask[a].vol;
 		}
 		
@@ -171,21 +171,21 @@ chMessage=function(msg){
 			row=document.getElementById("trades").insertRow(-1);
 			row.insertCell(0).innerHTML=msgData.trade[a].time;
 			row.insertCell(1).innerHTML=msgData.trade[a].qty;
-			row.insertCell(2).innerHTML=msgData.trade[a].price.toFixed(2);
+			row.insertCell(2).innerHTML=(msgData.trade[a].price/100).toFixed(2);
 			row.insertCell(3).innerHTML=msgData.trade[a].buyerId;
 			row.insertCell(4).innerHTML=msgData.trade[a].sellerId;
 		}
 		
-		closePrice=msgData.closePrice;
-		openPrice=msgData.openPrice;
-		highPrice=msgData.highPrice;
-		lowPrice=msgData.lowPrice;
-		lastPrice=msgData.lastPrice;
+		closePrice=msgData.closePrice/100;
+		openPrice=msgData.openPrice/100;
+		highPrice=msgData.highPrice/100;
+		lowPrice=msgData.lowPrice/100;
+		lastPrice=msgData.lastPrice/100;
 		lastVol=msgData.lastVol;
-		changeFromClose=msgData.changeFromClose;
-		changeFromClosePercent=msgData.changeFromClosePercent;
+		changeFromClose=msgData.changeFromClose/100;
+		changeFromClosePercent=msgData.changeFromClosePercent/100;
 		dayVol=msgData.dayVol;
-		dayVWAP=msgData.dayVWAP;
+		dayVWAP=msgData.dayVWAP/100;
 
 		document.getElementById("closePrice").innerHTML=closePrice.toFixed(2);
 		document.getElementById("openPrice").innerHTML=openPrice.toFixed(2);
@@ -212,8 +212,8 @@ chMessage=function(msg){
 		for (a=0;a<msgData.highScore.length;a++){
 			document.getElementById("highScores").deleteRow(ind);
 			row=document.getElementById("highScores").insertRow(ind);
-			row.insertCell(0).innerHTML=msgData.highScore[a].score.toFixed(2);
-			row.insertCell(1).innerHTML=msgData.highScore[a].userId+" ("+msgData.highScore[a].traderId+")";
+			row.insertCell(0).innerHTML=(msgData.highScore[a].score/100).toFixed(2);
+			row.insertCell(1).innerHTML=msgData.highScore[a].userName+" ("+msgData.highScore[a].userId+")";
 			ind++;
 		}
 		if (msgData.highScore.length>0){
@@ -246,9 +246,9 @@ chMessage=function(msg){
 							row.insertCell(0).innerHTML=msgData.order[a].orderId;
 							row.insertCell(1).innerHTML=msgData.order[a].side;
 							row.insertCell(2).innerHTML=msgData.order[a].orderQty;
-							row.insertCell(3).innerHTML=msgData.order[a].limitPrice.toFixed(2);
+							row.insertCell(3).innerHTML=(msgData.order[a].limitPrice/100).toFixed(2);
 							row.insertCell(4).innerHTML=msgData.order[a].execQty;
-							row.insertCell(5).innerHTML=msgData.order[a].avgPrice.toFixed(2);
+							row.insertCell(5).innerHTML=(msgData.order[a].avgPrice/100).toFixed(2);
 							row.insertCell(6).innerHTML=msgData.order[a].status;
 						}
 						found=1;
@@ -266,9 +266,9 @@ chMessage=function(msg){
 						row.insertCell(0).innerHTML=msgData.order[a].orderId;
 						row.insertCell(1).innerHTML=msgData.order[a].side;
 						row.insertCell(2).innerHTML=msgData.order[a].orderQty;
-						row.insertCell(3).innerHTML=msgData.order[a].limitPrice.toFixed(2);
+						row.insertCell(3).innerHTML=(msgData.order[a].limitPrice/100).toFixed(2);
 						row.insertCell(4).innerHTML=msgData.order[a].execQty;
-						row.insertCell(5).innerHTML=msgData.order[a].avgPrice.toFixed(2);
+						row.insertCell(5).innerHTML=(msgData.order[a].avgPrice/100).toFixed(2);
 						row.insertCell(6).innerHTML=msgData.order[a].status;
 					}
 				}
@@ -289,9 +289,9 @@ chMessage=function(msg){
 							row.insertCell(0).innerHTML=msgData.order[a].orderId;
 							row.insertCell(1).innerHTML=msgData.order[a].side;
 							row.insertCell(2).innerHTML=msgData.order[a].orderQty;
-							row.insertCell(3).innerHTML=msgData.order[a].limitPrice.toFixed(2);
+							row.insertCell(3).innerHTML=(msgData.order[a].limitPrice/100).toFixed(2);
 							row.insertCell(4).innerHTML=msgData.order[a].execQty;
-							row.insertCell(5).innerHTML=msgData.order[a].avgPrice.toFixed(2);
+							row.insertCell(5).innerHTML=(msgData.order[a].avgPrice/100).toFixed(2);
 							row.insertCell(6).innerHTML=msgData.order[a].status;
 						}
 						found=1;
@@ -309,9 +309,9 @@ chMessage=function(msg){
 						row.insertCell(0).innerHTML=msgData.order[a].orderId;
 						row.insertCell(1).innerHTML=msgData.order[a].side;
 						row.insertCell(2).innerHTML=msgData.order[a].orderQty;
-						row.insertCell(3).innerHTML=msgData.order[a].limitPrice.toFixed(2);
+						row.insertCell(3).innerHTML=(msgData.order[a].limitPrice/100).toFixed(2);
 						row.insertCell(4).innerHTML=msgData.order[a].execQty;
-						row.insertCell(5).innerHTML=msgData.order[a].avgPrice.toFixed(2);
+						row.insertCell(5).innerHTML=(msgData.order[a].avgPrice/100).toFixed(2);
 						row.insertCell(6).innerHTML=msgData.order[a].status;
 					}
 				}
@@ -328,9 +328,9 @@ chMessage=function(msg){
 			row.insertCell(0).innerHTML=activeBuyOrders[b].orderId;
 			row.insertCell(1).innerHTML=activeBuyOrders[b].side;
 			row.insertCell(2).innerHTML=activeBuyOrders[b].orderQty;
-			row.insertCell(3).innerHTML=activeBuyOrders[b].limitPrice.toFixed(2);
+			row.insertCell(3).innerHTML=(activeBuyOrders[b].limitPrice/100).toFixed(2);
 			row.insertCell(4).innerHTML=activeBuyOrders[b].execQty;
-			row.insertCell(5).innerHTML=activeBuyOrders[b].avgPrice.toFixed(2);
+			row.insertCell(5).innerHTML=(activeBuyOrders[b].avgPrice/100).toFixed(2);
 			row.insertCell(6).innerHTML=activeBuyOrders[b].status;
 			newrow=row.insertCell(7);
 			cxlButton=document.createElement("input");
@@ -350,9 +350,9 @@ chMessage=function(msg){
 			row.insertCell(0).innerHTML=activeSellOrders[b].orderId;
 			row.insertCell(1).innerHTML=activeSellOrders[b].side;
 			row.insertCell(2).innerHTML=activeSellOrders[b].orderQty;
-			row.insertCell(3).innerHTML=activeSellOrders[b].limitPrice.toFixed(2);
+			row.insertCell(3).innerHTML=(activeSellOrders[b].limitPrice/100).toFixed(2);
 			row.insertCell(4).innerHTML=activeSellOrders[b].execQty;
-			row.insertCell(5).innerHTML=activeSellOrders[b].avgPrice.toFixed(2);
+			row.insertCell(5).innerHTML=(activeSellOrders[b].avgPrice/100).toFixed(2);
 			row.insertCell(6).innerHTML=activeSellOrders[b].status;
 			newrow=row.insertCell(7);
 			cxlButton=document.createElement("input");
@@ -433,9 +433,9 @@ function initializePlayer(){
 	document.getElementById("lmtCheckBox").checked=true;
 	
 	var nickname=document.getElementById("myNickname").value;
-	userId=nickname.replace(/\W/g,"");
-	if (userId==""){
-		userId="Anonymous";
+	userName=nickname.replace(/\W/g,"");
+	if (userName==""){
+		userName="Anonymous";
 	}
 }
 
@@ -462,11 +462,11 @@ function startNewGame(){
 					          'onclose': chClose
 					        };
 					socket = channel.open(handler);
-					traderId=chResp.traderId;
-					document.getElementById("alerts").innerHTML="Your Trader ID is "+traderId+". There are "+chResp.activeTraderCount+" players connected now, including a market maker and a price taker bot!";
-					document.getElementById("myTraderId").innerHTML="Trader ID:"+traderId+" ("+userId+")";
+					userId=chResp.userId;
+					document.getElementById("alerts").innerHTML="Your User ID is "+userId+". You may start trading now. Watch out for the market-maker and price-taker bots!";
+					document.getElementById("myUserId").innerHTML="User ID:"+userId+" ("+userName+")";
 					document.getElementById("loggedIn").style.display="inline";
-					document.getElementById("myUserId").innerHTML=userId;
+					document.getElementById("myUserName").innerHTML=userName;
 			 	}
 			 	else{
 			 		document.getElementById("alerts").innerHTML="Cannot connect to game session. Refresh the page and try again in a few minutes!";
@@ -478,7 +478,7 @@ function startNewGame(){
 	channelReq.open("POST","/initConnection.do",true);
 
 	channelReq.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-	channelReq.send("userId="+userId);
+	channelReq.send("userName="+userName);
 	
 }
 
@@ -571,7 +571,7 @@ function newOrder(side){
 				req.open("POST","/invokeOrder.do",true);
 
 				req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-				req.send("symbol=HYP&side="+side+"&qty="+tradeVol+"&price="+orderPrice+"&orderType=NEW");
+				req.send("symbol=HYP&side="+side+"&qty="+tradeVol+"&price="+(orderPrice*100)+"&orderType=NEW");
 				
 				document.getElementById("myVol").value="";
 				document.getElementById("myPrice").value="";
@@ -620,7 +620,7 @@ function priceType(ptype){
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-XXXXXXXX-Y']);
+  _gaq.push(['_setAccount', 'UA-25201537-1']);
   _gaq.push(['_trackPageview']);
 
   (function() {
@@ -638,7 +638,7 @@ function priceType(ptype){
 <tr>
 
 <td><div id="companyName">Hypothetical Systems Corp (Ticker:HYP)</div></td>
-<td colspan="2"><div id="myTraderId">-</div></td>
+<td colspan="2"><div id="myUserId">-</div></td>
 </tr>
 
 <tr>
@@ -889,7 +889,7 @@ Optionally, you may enter a short nickname for yourself. This shows up on the hi
 <input type=button id="startNewGame" class="helpButtons" onclick="startNewGame()" value="Join Game" />
 </div>
 <div id="loggedIn">
-<i>Logged in as <b><div id="myUserId"></div></b></i>
+<i>Logged in as <b><div id="myUserName"></div></b></i>
 <br><br>
 <input type=button id="quitGame" class="helpButtons" onclick="quitGame()" value="Quit Game" />
 </div>

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.appspot.tradinghyp.User" table="AppUser" schema="TradingHyp">
+        <id name="userId" type="long" unsaved-value="0">
+            <column name="UserId" />
+            <generator class="native" />
+        </id>
+        <property name="userName" type="string">
+            <column name="UserName" length="20" />
+        </property>
+        <property name="loginTime" type="long">
+            <column name="LoginTime" />
+        </property>
+        <property name="logoutTime" type="long">
+            <column name="LogoutTime" />
+        </property>
+        <property name="longAvgPrice" type="long">
+            <column name="LongAvgPrice" />
+        </property>
+        <property name="longCash" type="long">
+            <column name="LongCash" />
+        </property>
+        <property name="longPosition" type="long">
+            <column name="LongPosition" />
+        </property>
+        <property name="origRealizedGain" type="long">
+            <column name="OrigRealizedGain" />
+        </property>
+        <property name="realizedGain" type="long">
+            <column name="RealizedGain" />
+        </property>
+        <property name="shortAvgPrice" type="long">
+            <column name="ShortAvgPrice" />
+        </property>
+        <property name="shortCash" type="long">
+            <column name="ShortCash" />
+        </property>
+        <property name="shortPosition" type="long">
+            <column name="ShortPosition" />
+        </property>
+    </class>
+    
+    <query name="ACTIVE_USERS">
+        <![CDATA[from User u where u.logoutTime = 0]]>
+    </query>
+    
+</hibernate-mapping>

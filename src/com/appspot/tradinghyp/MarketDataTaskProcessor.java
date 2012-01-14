@@ -14,156 +14,105 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.Map;
-import java.text.DecimalFormat;
 import javax.servlet.http.*;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.channel.*;
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheManager;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Arvind Rao
  *
- * Send market data update to user(s) using the cache (if available), or the datastore
+ * Send market data update to user(s) using the cache (if available), or the database
  */
 
 @SuppressWarnings("serial")
 public class MarketDataTaskProcessor extends HttpServlet {
-	private static final Logger log = Logger.getLogger(MarketDataTaskProcessor.class.getName());
+	private static final Logger log = LoggerFactory.getLogger(MarketDataTaskProcessor.class);
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		String symbol=req.getParameter("symbol");
 		String reloadCache=req.getParameter("reloadCache")!=null?req.getParameter("reloadCache"):"N";
-		String traderId=req.getParameter("traderId");
+		String userId=req.getParameter("userId");
 		String scores=req.getParameter("scores")!=null?req.getParameter("scores"):"N";
 		Long startTradeId=req.getParameter("startTradeId")!=null?new Long(req.getParameter("startTradeId")):0;
 		Long endTradeId=req.getParameter("endTradeId")!=null?new Long(req.getParameter("endTradeId")):0;
 		
 		Map props =null;
 		try{
+			ApplicationContext ctx=WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+			BusinessManager bMgr=(BusinessManager) ctx.getBean(Constants.ROOT_BEAN);
 			CacheManager mcacheMgr = CacheManager.getInstance();
 
 			Cache mktDataCache=mcacheMgr.getCache("MarketDataCache");
 			if (mktDataCache == null){
 			    props = new HashMap();
-			    props.put(GCacheFactory.EXPIRATION_DELTA, 36000);
+			    props.put(GCacheFactory.EXPIRATION_DELTA, Constants.CACHE_EXPIRATION);
 				mktDataCache = mcacheMgr.getCacheFactory().createCache(props);
 				mcacheMgr.registerCache("MarketDataCache", mktDataCache);
 			}
 
-			TreeMap<Float,Long> bidMap=(TreeMap<Float,Long>)mktDataCache.get(Constants.MktDataStatistic.BID);
+			Map<Long,Long> bidMap=(Map<Long,Long>)mktDataCache.get(Constants.MktDataStatistic.BID);
 			if (reloadCache.equals("Y") || bidMap==null){
-				log.warning("Reloading bid cache from order book");
-				bidMap=Util.getBidsFromOrderBook();
+				log.warn("Reloading bid cache from order book");
+				bidMap=bMgr.getActiveBids();
 				mktDataCache.put(Constants.MktDataStatistic.BID,bidMap);
 			}
 			
-			TreeMap<Float,Long> askMap=(TreeMap<Float,Long>)mktDataCache.get(Constants.MktDataStatistic.ASK);;
+			Map<Long,Long> askMap=(TreeMap<Long,Long>)mktDataCache.get(Constants.MktDataStatistic.ASK);;
 			if (reloadCache.equals("Y") || askMap==null){
-				log.warning("Reloading ask cache from order book");
-				askMap=Util.getAsksFromOrderBook();
+				log.warn("Reloading ask cache from order book");
+				askMap=bMgr.getActiveOffers();
 				mktDataCache.put(Constants.MktDataStatistic.ASK,askMap);
 			}
 
-			ArrayList<Trade> tradeList=(ArrayList<Trade>)mktDataCache.get(Constants.MktDataStatistic.ONX_TRADE);
-
+			List<Trade> tradeList=(ArrayList<Trade>)mktDataCache.get(Constants.MktDataStatistic.ONX_TRADE);
 			if (tradeList==null){
 				if (startTradeId==0 || endTradeId==0 || startTradeId>endTradeId){
 					tradeList=new ArrayList<Trade>();
 				}
 				else{
-					log.warning("Reloading trades from trade book");
-					tradeList=Util.getTradesFromTradeBook(startTradeId,endTradeId);
+					log.warn("Reloading trades from trade book");
+					tradeList=bMgr.getTrades(startTradeId,endTradeId);
 				}
 			}
+
+			TradeStats tStats=(TradeStats)mktDataCache.get(Constants.MktDataStatistic.TRADE_STATS);
 			
-			Float closePrice=(Float)mktDataCache.get(Constants.MktDataStatistic.CLOSE_PRICE);
-			Float openPrice=(Float)mktDataCache.get(Constants.MktDataStatistic.OPEN_PRICE);
-			Float highPrice=(Float)mktDataCache.get(Constants.MktDataStatistic.HIGH_PRICE);
-			Float lowPrice=(Float)mktDataCache.get(Constants.MktDataStatistic.LOW_PRICE);
-			Float changeFromClose=(Float)mktDataCache.get(Constants.MktDataStatistic.CHANGE_FROM_CLOSE);
-			Float changeFromClosePercent=(Float)mktDataCache.get(Constants.MktDataStatistic.CHANGE_FROM_CLOSE_PERCENT);
-			Float lastPrice=(Float)mktDataCache.get(Constants.MktDataStatistic.LAST_PRICE);
-			Long lastVol=(Long)mktDataCache.get(Constants.MktDataStatistic.LAST_VOLUME);
-			Double dayValue=(Double)mktDataCache.get(Constants.MktDataStatistic.DAY_VALUE);
-			Long dayVol=(Long)mktDataCache.get(Constants.MktDataStatistic.DAY_VOLUME);
-			
-			if (lastPrice==null || lastVol==null 
-				|| closePrice==null || openPrice==null
-				|| highPrice==null  || lowPrice==null
-				|| dayValue==null || dayVol==null
-				|| changeFromClose==null || changeFromClosePercent==null){
-				DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-				PreparedQuery pq=null,obPQ=null;
-				Entity ob=null,ostats=null;
-				Query q=null, obQ=null;
-				obQ=new Query("OrderBook");
-				obQ.addFilter("active",Query.FilterOperator.EQUAL,true);
-				obPQ = ds.prepare(obQ);
-				ob=obPQ.asIterator().next();
-
-				q=new Query("OrderStats");
-				q.setAncestor(ob.getKey());
-				q.addFilter("active",Query.FilterOperator.EQUAL,true);
-				pq=ds.prepare(q);
-				ostats=pq.asIterator().next();
-
-				highPrice=((Double)ostats.getProperty("highPrice")).floatValue();
-				lowPrice=((Double)ostats.getProperty("lowPrice")).floatValue();
-				openPrice=((Double)ostats.getProperty("openPrice")).floatValue();
-				closePrice=((Double)ostats.getProperty("closePrice")).floatValue();
-				changeFromClose=((Double)ostats.getProperty("changeFromClose")).floatValue();
-				changeFromClosePercent=((Double)ostats.getProperty("changeFromClosePercent")).floatValue();
-
-				lastVol=(Long)ostats.getProperty("lastVolume");
-				lastPrice=((Double)ostats.getProperty("lastPrice")).floatValue();
-				dayVol=(Long)ostats.getProperty("dayVolume");
-				dayValue=(Double)ostats.getProperty("dayValue");
-
-				mktDataCache.put(Constants.MktDataStatistic.CLOSE_PRICE,closePrice);
-				mktDataCache.put(Constants.MktDataStatistic.OPEN_PRICE,openPrice);
-				mktDataCache.put(Constants.MktDataStatistic.HIGH_PRICE,highPrice);
-				mktDataCache.put(Constants.MktDataStatistic.LOW_PRICE,lowPrice);
-				mktDataCache.put(Constants.MktDataStatistic.CHANGE_FROM_CLOSE,changeFromClose);
-				mktDataCache.put(Constants.MktDataStatistic.CHANGE_FROM_CLOSE_PERCENT,changeFromClosePercent);
-				mktDataCache.put(Constants.MktDataStatistic.LAST_PRICE,lastPrice);
-				mktDataCache.put(Constants.MktDataStatistic.LAST_VOLUME,lastVol);
-				mktDataCache.put(Constants.MktDataStatistic.DAY_VALUE,dayValue);
-				mktDataCache.put(Constants.MktDataStatistic.DAY_VOLUME,dayVol);
-
+			if (tStats==null){
+				tStats=bMgr.getTradeStats();
+				mktDataCache.put(Constants.MktDataStatistic.TRADE_STATS,tStats);
 			}
 			
-			Float dayVWAP=(float) ((dayVol>0)?(dayValue/dayVol):0);
+			long dayVWAP=tStats.getDayVolume()>0?(tStats.getDayValue()/tStats.getDayVolume()):0;
 
 			//Build JSON string representing trade stats
 			StringBuffer quotes=new StringBuffer("{\"type\":\"MKTDATA\"");
-			quotes.append(",\"closePrice\":"+new DecimalFormat("#0.00").format(closePrice));
-			quotes.append(",\"openPrice\":"+new DecimalFormat("#0.00").format(openPrice));
-			quotes.append(",\"highPrice\":"+new DecimalFormat("#0.00").format(highPrice));
-			quotes.append(",\"lowPrice\":"+new DecimalFormat("#0.00").format(lowPrice));
-			quotes.append(",\"changeFromClose\":"+new DecimalFormat("#0.00").format(changeFromClose));
-			quotes.append(",\"changeFromClosePercent\":"+new DecimalFormat("#0.00").format(changeFromClosePercent));
-			quotes.append(",\"lastPrice\":"+new DecimalFormat("#0.00").format(lastPrice));
-			quotes.append(",\"lastVol\":"+lastVol.toString());
-			quotes.append(",\"dayVWAP\":"+new DecimalFormat("#0.00").format(dayVWAP));
-			quotes.append(",\"dayVol\":"+dayVol.toString());
+			quotes.append(",\"closePrice\":"+tStats.getClosePrice());
+			quotes.append(",\"openPrice\":"+tStats.getOpenPrice());
+			quotes.append(",\"highPrice\":"+tStats.getHighPrice());
+			quotes.append(",\"lowPrice\":"+tStats.getLowPrice());
+			quotes.append(",\"changeFromClose\":"+tStats.getChangeFromClose());
+			quotes.append(",\"changeFromClosePercent\":"+tStats.getChangeFromClosePercent());
+			quotes.append(",\"lastPrice\":"+tStats.getLastPrice());
+			quotes.append(",\"lastVol\":"+tStats.getLastVolume());
+			quotes.append(",\"dayVWAP\":"+dayVWAP);
+			quotes.append(",\"dayVol\":"+tStats.getDayVolume());
 			
 			//Build JSON string representing best bids and asks
 			quotes.append(",\"bid\":[");
 
 			int i=1;
-			for(Map.Entry<Float,Long> bid : bidMap.entrySet()){
-				quotes.append("{\"price\":"+new DecimalFormat("#0.00").format(bid.getKey())+",\"vol\":"+bid.getValue()+"},");
+			for(Map.Entry<Long,Long> bid : bidMap.entrySet()){
+				quotes.append("{\"price\":"+bid.getKey()+",\"vol\":"+bid.getValue()+"},");
 				i++;
 				if (i>Constants.QUOTE_COUNT){
 					break;
@@ -171,15 +120,15 @@ public class MarketDataTaskProcessor extends HttpServlet {
 			}
 			//insert 0s for remaining bids
 			for (;i<=Constants.QUOTE_COUNT;i++){
-				quotes.append("{\"price\":"+new DecimalFormat("#0.00").format(0)+",\"vol\":"+0+"},");
+				quotes.append("{\"price\":"+0+",\"vol\":"+0+"},");
 			}
 
 			quotes.deleteCharAt(quotes.lastIndexOf(","));
 			quotes.append("],\"ask\":[");
 
 			i=1;
-			for(Map.Entry<Float,Long> ask : askMap.entrySet()){
-				quotes.append("{\"price\":"+new DecimalFormat("#0.00").format(ask.getKey())+",\"vol\":"+ask.getValue()+"},");
+			for(Map.Entry<Long,Long> ask : askMap.entrySet()){
+				quotes.append("{\"price\":"+ask.getKey()+",\"vol\":"+ask.getValue()+"},");
 				i++;
 				if (i>Constants.QUOTE_COUNT){
 					break;
@@ -187,7 +136,7 @@ public class MarketDataTaskProcessor extends HttpServlet {
 			}
 			//insert 0s for remaining asks
 			for (;i<=Constants.QUOTE_COUNT;i++){
-				quotes.append("{\"price\":"+new DecimalFormat("#0.00").format(0)+",\"vol\":"+0+"},");
+				quotes.append("{\"price\":"+0+",\"vol\":"+0+"},");
 			}
 
 			quotes.deleteCharAt(quotes.lastIndexOf(","));
@@ -207,7 +156,7 @@ public class MarketDataTaskProcessor extends HttpServlet {
 									+(cal.get(Calendar.SECOND)<10?"0":"")+cal.get(Calendar.SECOND)+"\","
 								);
 					quotes.append("\"qty\":"+t.getQty()
-									+",\"price\":"+new DecimalFormat("#0.00").format(t.getPrice())
+									+",\"price\":"+t.getPrice()
 									+",\"buyerId\":\""+t.getBuyerId()+"\""
 									+",\"sellerId\":\""+t.getSellerId()+"\""
 									+"},"
@@ -220,12 +169,12 @@ public class MarketDataTaskProcessor extends HttpServlet {
 			
 			ChannelService chService=ChannelServiceFactory.getChannelService();
 			
-			if (traderId!=null){
+			if (userId!=null){
 				//send message to one trader
 				quotes.append(",\"highScore\":[]}");
 				//log.info(quotes.toString());
-				chService.sendMessage(new ChannelMessage(traderId,quotes.toString()));
-				log.info("Individual message to traderId "+traderId);
+				chService.sendMessage(new ChannelMessage(userId,quotes.toString()));
+				log.info("Individual message to userId "+userId);
 			}
 			else{
 				//send message to all traders
@@ -236,15 +185,17 @@ public class MarketDataTaskProcessor extends HttpServlet {
 					userCache = mcacheMgr.getCacheFactory().createCache(props);
 					mcacheMgr.registerCache("UserCache", userCache);
 				}
-				HashMap<String,User> users=(HashMap<String,User>) userCache.get(Constants.UserType.TRADER);
+				Map<Long,User> users=(HashMap<Long,User>) userCache.get(Constants.UserType.TRADER);
 				
 				if (users==null){
-					log.warning("Creating user cache");
-					users=Util.fetchUsers();
-					userCache.put(Constants.UserType.TRADER, users);
+					log.warn("Creating user cache");
+					users=bMgr.getActiveUsers();
+					if (users!=null){
+						userCache.put(Constants.UserType.TRADER, users);	
+					}
 				}
 				
-				ArrayList<User> u=null;
+				List<User> u=null;
 				int hsCount=0;
 				quotes.append(",\"highScore\":[");
 				if (scores.equals("Y")){
@@ -255,9 +206,9 @@ public class MarketDataTaskProcessor extends HttpServlet {
 					while (it3.hasNext() && hsCount<=Constants.HIGH_SCORE_COUNT){
 						User x=it3.next();
 						if (x.getRealizedGain()>0){
-							quotes.append("{\"userId\":\""+x.getUserId());
-							quotes.append("\",\"traderId\":\""+x.getTraderId());
-							quotes.append("\",\"score\":"+new DecimalFormat("#0.00").format(x.getRealizedGain()));
+							quotes.append("{\"userName\":\""+x.getUserName());
+							quotes.append("\",\"userId\":\""+x.getUserId());
+							quotes.append("\",\"score\":"+x.getRealizedGain());
 							quotes.append("},");
 							hsCount++;
 						}
@@ -275,13 +226,14 @@ public class MarketDataTaskProcessor extends HttpServlet {
 				
 				//log.info(quotes.toString());
 				
-				Iterator<String> it2 = users.keySet().iterator();
+				Iterator<Long> it2 = users.keySet().iterator();
+				Long uId;
 				while(it2.hasNext()){
-					traderId=it2.next();
+					uId=it2.next();
 					//log.info("MarketDataProcessor: Broadcast message to traderId "+traderId);
-					//do not send update to bots
-					if (!traderId.contains("BOT")){
-						chService.sendMessage(new ChannelMessage(traderId,quotes.toString()));
+					//do not send update to bots (identified by user Ids less than 100)
+					if (uId>100){
+						chService.sendMessage(new ChannelMessage(uId.toString(),quotes.toString()));
 					}
 				}
 
@@ -290,15 +242,12 @@ public class MarketDataTaskProcessor extends HttpServlet {
 			//remove the trade cache as we don't want to keep it except for this order update
 			mktDataCache.remove(Constants.MktDataStatistic.ONX_TRADE);
 
-			//CacheStatistics cstats=mktDataCache.getCacheStatistics();
-			//log.info(cstats.toString());
-			
 		}
 		catch (CacheException e) {
-			log.log(Level.SEVERE, "EXCEPTION", e);
+			log.error( "EXCEPTION", e);
 		}
 		catch (Exception e) {
-			log.log(Level.SEVERE, "EXCEPTION", e);
+			log.error( "EXCEPTION", e);
 		}		
 	}
 

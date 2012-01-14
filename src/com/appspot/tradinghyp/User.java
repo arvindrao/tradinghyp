@@ -13,54 +13,65 @@ import java.io.Serializable;
 /**
  * @author Arvind Rao
  *
- * Represents a user.
+ * Represents a user entity.
  */
 public class User implements Serializable,Comparable<User> {
-	private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 1L;
 
-	public User() {
-		longPosition=0;
-		shortPosition=0;
-		shortCash=0;
-		longCash=0;
-		realizedGain=0;
-		origRealizedGain=0;
-		shortAvgPrice=0;
-		longAvgPrice=0;
-		loginTime=System.currentTimeMillis();
-		logoutTime=0;
-		userId=null;
-		traderId=null;
-	}
-
-	public User(String userId,String traderId) {
-		longPosition=0;
-		shortPosition=0;
-		shortCash=0;
-		longCash=0;
-		realizedGain=0;
-		origRealizedGain=0;
-		shortAvgPrice=0;
-		longAvgPrice=0;
-		loginTime=System.currentTimeMillis();
-		logoutTime=0;
-		this.userId=userId;
-		this.traderId=traderId;
-	}
-	
-	private String userId;
-	private String traderId;
+	private long userId;
+	private String userName;
 	private long longPosition;
 	private long shortPosition;
-	private double shortCash;
-	private double longCash;
-	private double realizedGain;
-	private double origRealizedGain;
-	private float shortAvgPrice;
-	private float longAvgPrice;
+	private long shortCash;
+	private long longCash;
+	private long realizedGain;
+	private long origRealizedGain;
+	private long shortAvgPrice;
+	private long longAvgPrice;
 	private long loginTime;
 	private long logoutTime;
 	
+
+	public User() {
+	}
+
+	public User(String userName) {
+		this.userName=userName;
+	}
+
+	public User(long userId,String userName) {
+		this.userId=userId;
+		this.userName=userName;
+	}
+	
+
+	/**
+	 * @return the userId
+	 */
+	public long getUserId() {
+		return userId;
+	}
+
+	/**
+	 * @param userId the userId to set
+	 */
+	public void setUserId(long userId) {
+		this.userId = userId;
+	}
+
+	/**
+	 * @return the userName
+	 */
+	public String getUserName() {
+		return userName;
+	}
+
+	/**
+	 * @param userName the userName to set
+	 */
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
 	/**
 	 * @return the longPosition
@@ -68,119 +79,110 @@ public class User implements Serializable,Comparable<User> {
 	public long getLongPosition() {
 		return longPosition;
 	}
+
 	/**
 	 * @param longPosition the longPosition to set
 	 */
 	public void setLongPosition(long longPosition) {
 		this.longPosition = longPosition;
 	}
+
 	/**
 	 * @return the shortPosition
 	 */
 	public long getShortPosition() {
 		return shortPosition;
 	}
+
 	/**
 	 * @param shortPosition the shortPosition to set
 	 */
 	public void setShortPosition(long shortPosition) {
 		this.shortPosition = shortPosition;
 	}
+
 	/**
 	 * @return the shortCash
 	 */
-	public double getShortCash() {
+	public long getShortCash() {
 		return shortCash;
 	}
+
 	/**
 	 * @param shortCash the shortCash to set
 	 */
-	public void setShortCash(double shortCash) {
+	public void setShortCash(long shortCash) {
 		this.shortCash = shortCash;
 	}
+
 	/**
 	 * @return the longCash
 	 */
-	public double getLongCash() {
+	public long getLongCash() {
 		return longCash;
 	}
+
 	/**
 	 * @param longCash the longCash to set
 	 */
-	public void setLongCash(double longCash) {
+	public void setLongCash(long longCash) {
 		this.longCash = longCash;
 	}
+
 	/**
 	 * @return the realizedGain
 	 */
-	public double getRealizedGain() {
+	public long getRealizedGain() {
 		return realizedGain;
 	}
+
 	/**
 	 * @param realizedGain the realizedGain to set
 	 */
-	public void setRealizedGain(double realizedGain) {
+	public void setRealizedGain(long realizedGain) {
 		this.realizedGain = realizedGain;
 	}
+
 	/**
 	 * @return the origRealizedGain
 	 */
-	public double getOrigRealizedGain() {
+	public long getOrigRealizedGain() {
 		return origRealizedGain;
 	}
+
 	/**
 	 * @param origRealizedGain the origRealizedGain to set
 	 */
-	public void setOrigRealizedGain(double origRealizedGain) {
+	public void setOrigRealizedGain(long origRealizedGain) {
 		this.origRealizedGain = origRealizedGain;
 	}
+
 	/**
 	 * @return the shortAvgPrice
 	 */
-	public float getShortAvgPrice() {
+	public long getShortAvgPrice() {
 		return shortAvgPrice;
 	}
+
 	/**
 	 * @param shortAvgPrice the shortAvgPrice to set
 	 */
-	public void setShortAvgPrice(float shortAvgPrice) {
+	public void setShortAvgPrice(long shortAvgPrice) {
 		this.shortAvgPrice = shortAvgPrice;
 	}
+
 	/**
 	 * @return the longAvgPrice
 	 */
-	public float getLongAvgPrice() {
+	public long getLongAvgPrice() {
 		return longAvgPrice;
 	}
+
 	/**
 	 * @param longAvgPrice the longAvgPrice to set
 	 */
-	public void setLongAvgPrice(float longAvgPrice) {
+	public void setLongAvgPrice(long longAvgPrice) {
 		this.longAvgPrice = longAvgPrice;
-	}
-	/**
-	 * @return the userId
-	 */
-	public String getUserId() {
-		return userId;
-	}
-	/**
-	 * @param userId the userId to set
-	 */
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-	/**
-	 * @return the traderId
-	 */
-	public String getTraderId() {
-		return traderId;
-	}
-	/**
-	 * @param traderId the traderId to set
-	 */
-	public void setTraderId(String traderId) {
-		this.traderId = traderId;
 	}
 
 	/**
@@ -212,12 +214,13 @@ public class User implements Serializable,Comparable<User> {
 	}
 
 	@Override
-	public int compareTo(User o) {
+	public int compareTo(User u) {
 		//use score for comparison
-		if (this.realizedGain==o.getRealizedGain()){
+		long otherRealizedGain=u.getRealizedGain();
+		if (realizedGain==otherRealizedGain){
 			return 0;
 		}
-		else if (this.realizedGain>o.getRealizedGain()){
+		else if (realizedGain>otherRealizedGain){
 			return 1;
 		}
 		else{
@@ -225,7 +228,35 @@ public class User implements Serializable,Comparable<User> {
 		}
 	}
 
-	public void updateScore(Short lastExecSide, long lastExecVol, float lastExecPrice){
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj){
+			return true;
+		}
+		if (obj == null){
+			return false;
+		}
+		if (!(obj instanceof User)){
+			return false;
+		}
+		User other = (User) obj;
+		if (userId != other.userId){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 17;
+		result = prime * result + (int) (userId ^ (userId >>> 32));
+		return result;
+	}
+	
+	public void updateScore(short lastExecSide, long lastExecVol, long lastExecPrice){
 		if (lastExecSide==Constants.BUY){
 			if (shortPosition>0){
 				//player is short, try to close out as much of this position as possible
@@ -290,5 +321,14 @@ public class User implements Serializable,Comparable<User> {
 		}
 
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", userName=" + userName
+				+ ", loginTime=" + loginTime + ", logoutTime=" + logoutTime
+				+ "]";
+	}
 }

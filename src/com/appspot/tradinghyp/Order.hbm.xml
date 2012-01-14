@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.appspot.tradinghyp.Order" table="StockOrder" schema="TradingHyp">
+        <id name="orderId" type="long" unsaved-value="0">
+            <column name="OrderId" />
+            <generator class="native" />
+        </id>
+        <property name="userId" type="long">
+            <column name="UserId"  />
+        </property>
+        <property name="symbol" type="string">
+            <column name="Symbol" length="10" />
+        </property>
+        <property name="side" type="short">
+            <column name="Side" />
+        </property>
+        <property name="orderQty" type="long">
+            <column name="OrderQty" />
+        </property>
+        <property name="price" type="long">
+            <column name="Price" />
+        </property>
+        <property name="execQty" type="long">
+            <column name="ExecQty" />
+        </property>
+        <property name="tradeValue" type="long">
+            <column name="TradeValue" />
+        </property>
+        <property name="status" type="short">
+            <column name="Status" />
+        </property>
+        <property name="orderTime" type="long">
+            <column name="OrderTime" />
+        </property>
+
+    </class>
+    
+    <query name="ACTIVE_BIDS">
+        <![CDATA[select price,sum(o.orderQty-o.execQty) from Order o where o.status=1 and o.side=0 group by o.price order by o.price desc]]>
+    </query>
+    <query name="ACTIVE_OFFERS">
+        <![CDATA[select price,sum(o.orderQty-o.execQty) from Order o where o.status=1 and o.side in (1,2) group by o.price order by o.price]]>
+    </query>
+    <query name="MATCH_OFFERS">
+        <![CDATA[from Order o where o.status=1 and o.side in (1,2) and o.price<= :price order by o.price,o.orderTime]]>
+    </query>
+    <query name="MATCH_BIDS">
+        <![CDATA[from Order o where o.status=1 and o.side =0 and o.price >= :price order by o.price desc,o.orderTime asc]]>
+    </query>
+    <query name="USER_ORDERS">
+        <![CDATA[from Order o where o.status=1 and o.userId= :userId]]>
+    </query>
+    
+</hibernate-mapping>

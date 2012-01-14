@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.appspot.tradinghyp.Trade" table="Trade" schema="TradingHyp">
+        <id name="tradeId" type="long" unsaved-value="0">
+            <column name="TradeId" />
+            <generator class="native" />
+        </id>
+        <property name="tradeTime" type="long">
+            <column name="TradeTime" />
+        </property>
+        <property name="qty" type="long">
+            <column name="Qty" />
+        </property>
+        <property name="price" type="long">
+            <column name="Price" />
+        </property>
+        <property name="buyerId" type="long">
+            <column name="BuyerId" />
+        </property>
+        <property name="sellerId" type="long">
+            <column name="SellerId" />
+        </property>
+    </class>
+    
+</hibernate-mapping>

@@ -30,7 +30,7 @@ public class OrderTaskInvoker extends HttpServlet {
 		String side=req.getParameter("side");
 		String qty=req.getParameter("qty");
 		String price=req.getParameter("price");
-		String traderId=(String)req.getSession().getAttribute("traderId");
+		Long userId=(Long)(req.getSession().getAttribute("userId"));
 
 		Queue oQueue= QueueFactory.getQueue("OrderTaskQueue");
 		
@@ -40,7 +40,7 @@ public class OrderTaskInvoker extends HttpServlet {
 					.param("side",side.equals("B")?"0":"1")
 					.param("qty",qty)
 					.param("price",price)
-					.param("traderId", traderId)
+					.param("userId", new Long(userId).toString())
 					.method(Method.POST));
 
 					resp.setContentType("text/plain");
@@ -50,7 +50,7 @@ public class OrderTaskInvoker extends HttpServlet {
 			long orderId=new Long(req.getParameter("orderId"));
 			oQueue.add(withUrl("/tasks/processCancelOrder.do")
 					.param("symbol",symbol)
-					.param("traderId", traderId)
+					.param("userId", new Long(userId).toString())
 					.param("orderId", ((Long)orderId).toString())
 					.method(Method.POST));
 

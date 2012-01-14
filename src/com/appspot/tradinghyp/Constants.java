@@ -14,6 +14,9 @@ package com.appspot.tradinghyp;
  * Global constants
  */
 public final class Constants {
+	
+	public static final String ROOT_BEAN = "appManager";
+	
 	//Order status
 	public static short ORD_PENDING=0;
 	public static short ORD_ACK=1;
@@ -30,20 +33,10 @@ public final class Constants {
 	public static short QUOTE_COUNT=5;
 	public static short HIGH_SCORE_COUNT=11;
 	
-	public static String OB_KEY="OB1";
-	
 	public enum OrderStatistic {ORDER_COUNT,LAST_ORDER_ID,LAST_TRADER_ID,ACTIVE_TRADER_COUNT,LAST_TRADE_ID,TRADE_COUNT};
 	
 	//mkt data
-	public static float INIT_CLOSE_PRICE=200.0F;
-	public static float INIT_OPEN_PRICE=201.0F;
-	public static long LOT_SIZE=100L;
-	public static float TICK_SIZE=0.01F;
-	
-	public enum MktDataStatistic {BID,ASK,ONX_TRADE,OFFX_TRADE,
-								CLOSE_PRICE,OPEN_PRICE,HIGH_PRICE,LOW_PRICE,
-								LAST_PRICE,LAST_VOLUME,DAY_VOLUME,DAY_VALUE,
-								CHANGE_FROM_CLOSE,CHANGE_FROM_CLOSE_PERCENT};
+	public enum MktDataStatistic {BID,ASK,TRADE_STATS,ONX_TRADE};
 	
 	public enum UserType {TRADER};
 	
@@ -52,13 +45,24 @@ public final class Constants {
 	public static long MIN_MT_BOT_QTY=1;
 	public static long MAX_MT_BOT_QTY=5;
 	
-	public static String BOT1_TRADER_ID="BOT1";
-	public static String BOT2_TRADER_ID="BOT2";
+	public static String BOT1_USER_ID="1";
+	public static String BOT2_USER_ID="2";
+	
+	public static String QUERY_ACTIVE_USERS="ACTIVE_USERS";
+	public static String QUERY_ACTIVE_BIDS="ACTIVE_BIDS";
+	public static String QUERY_ACTIVE_OFFERS="ACTIVE_OFFERS";
+	public static String QUERY_TRADES="TRADES";
+	public static String QUERY_MATCH_BIDS="MATCH_BIDS";
+	public static String QUERY_MATCH_OFFERS="MATCH_OFFERS";
+	public static String QUERY_USER_ORDERS="USER_ORDERS";
+	
+	public static long LOT_SIZE=100L;
+	public static long TICK_SIZE=1L;
+
+	public static int CACHE_EXPIRATION=36000;
 	
 	private Constants(){
 		throw new AssertionError();
 		
 	}
-	
-	
 }

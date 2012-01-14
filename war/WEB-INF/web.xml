@@ -4,24 +4,18 @@ xmlns="http://java.sun.com/xml/ns/javaee"
 xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+	<context-param>
+	  <param-name>contextConfigLocation</param-name>
+	  <param-value>/WEB-INF/spring-appcontext.xml</param-value>
+	</context-param>
+
+	<listener>
+	  <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
 	<listener>
 	 <listener-class>com.appspot.tradinghyp.InitServlet</listener-class>
 	</listener>
-
-    <servlet>
-        <servlet-name>india</servlet-name>
-        <jsp-file>/india.jsp</jsp-file>
-    </servlet>
-
-    <servlet>
-        <servlet-name>global</servlet-name>
-        <jsp-file>/global.jsp</jsp-file>
-    </servlet>
-
-    <servlet>
-        <servlet-name>multiplayer</servlet-name>
-        <jsp-file>/multiplayer.jsp</jsp-file>
-    </servlet>
 
 	<servlet>
 		<servlet-name>ConnectionInitializer</servlet-name>
@@ -29,8 +23,13 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	</servlet>
 
 	<servlet>
-		<servlet-name>ConnectionRefresher</servlet-name>
-		<servlet-class>com.appspot.tradinghyp.ConnectionRefresher</servlet-class>
+		<servlet-name>MarketDataTaskInvoker</servlet-name>
+		<servlet-class>com.appspot.tradinghyp.MarketDataTaskInvoker</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>MarketDataTaskProcessor</servlet-name>
+		<servlet-class>com.appspot.tradinghyp.MarketDataTaskProcessor</servlet-class>
 	</servlet>
 
 	<servlet>
@@ -49,21 +48,6 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	</servlet>
 
 	<servlet>
-		<servlet-name>MarketDataTaskInvoker</servlet-name>
-		<servlet-class>com.appspot.tradinghyp.MarketDataTaskInvoker</servlet-class>
-	</servlet>
-
-	<servlet>
-		<servlet-name>MarketDataTaskProcessor</servlet-name>
-		<servlet-class>com.appspot.tradinghyp.MarketDataTaskProcessor</servlet-class>
-	</servlet>
-
-	<servlet>
-		<servlet-name>DisconnectionDetector</servlet-name>
-		<servlet-class>com.appspot.tradinghyp.DisconnectionDetector</servlet-class>
-	</servlet>
-
-	<servlet>
 		<servlet-name>MarketMakerBot</servlet-name>
 		<servlet-class>com.appspot.tradinghyp.MarketMakerBot</servlet-class>
 	</servlet>
@@ -74,24 +58,25 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	</servlet>
 
 	<servlet>
-		<servlet-name>BotInitializer</servlet-name>
-		<servlet-class>com.appspot.tradinghyp.BotInitializer</servlet-class>
+		<servlet-name>DisconnectionDetector</servlet-name>
+		<servlet-class>com.appspot.tradinghyp.DisconnectionDetector</servlet-class>
 	</servlet>
 
-    <servlet-mapping>
+    <servlet>
         <servlet-name>india</servlet-name>
-        <url-pattern>/india</url-pattern>
-    </servlet-mapping>
+        <jsp-file>/india.jsp</jsp-file>
+    </servlet>
 
-    <servlet-mapping>
+    <servlet>
         <servlet-name>global</servlet-name>
-        <url-pattern>/global</url-pattern>
-    </servlet-mapping>
+        <jsp-file>/global.jsp</jsp-file>
+    </servlet>
 
-    <servlet-mapping>
+    <servlet>
         <servlet-name>multiplayer</servlet-name>
-        <url-pattern>/multiplayer</url-pattern>
-    </servlet-mapping>
+        <jsp-file>/multiplayer.jsp</jsp-file>
+    </servlet>
+
 
 	<servlet-mapping>
 		<servlet-name>ConnectionInitializer</servlet-name>
@@ -99,8 +84,13 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	</servlet-mapping>
 
 	<servlet-mapping>
-		<servlet-name>ConnectionRefresher</servlet-name>
-		<url-pattern>/refreshConnection.do</url-pattern>
+		<servlet-name>MarketDataTaskInvoker</servlet-name>
+		<url-pattern>/refreshMarketData.do</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>MarketDataTaskProcessor</servlet-name>
+		<url-pattern>/tasks/processMarketData.do</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
@@ -119,16 +109,6 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	</servlet-mapping>
 
 	<servlet-mapping>
-		<servlet-name>MarketDataTaskInvoker</servlet-name>
-		<url-pattern>/refreshMarketData.do</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>MarketDataTaskProcessor</servlet-name>
-		<url-pattern>/tasks/processMarketData.do</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
 		<servlet-name>MarketMakerBot</servlet-name>
 		<url-pattern>/cron/makeMarket.do</url-pattern>
 	</servlet-mapping>
@@ -139,14 +119,24 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	</servlet-mapping>
 
 	<servlet-mapping>
-		<servlet-name>BotInitializer</servlet-name>
-		<url-pattern>/init/initializeBot.do</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
 		<servlet-name>DisconnectionDetector</servlet-name>
 		<url-pattern>/_ah/channel/disconnected/</url-pattern>
 	</servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>india</servlet-name>
+        <url-pattern>/india</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>global</servlet-name>
+        <url-pattern>/global</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>multiplayer</servlet-name>
+        <url-pattern>/multiplayer</url-pattern>
+    </servlet-mapping>
 
 	<welcome-file-list>
 		<welcome-file>welcome.jsp</welcome-file>

@@ -17,9 +17,8 @@ import java.io.Serializable;
 public class Trade implements Serializable{
 	private static final long serialVersionUID = 1;
 	
-	public Trade(long tradeId, long tradeTime, long qty, float price,
-			String buyerId, String sellerId) {
-		this.tradeId = tradeId;
+	public Trade(long tradeTime, long qty, long price,
+			long buyerId, long sellerId) {
 		this.tradeTime = tradeTime;
 		this.qty = qty;
 		this.price = price;
@@ -33,9 +32,10 @@ public class Trade implements Serializable{
 	private long tradeId;
 	private long tradeTime;
 	private long qty;
-	private float price;
-	private String buyerId;
-	private String sellerId;
+	private long price;
+	private long buyerId;
+	private long sellerId;
+
 	/**
 	 * @return the tradeId
 	 */
@@ -75,38 +75,83 @@ public class Trade implements Serializable{
 	/**
 	 * @return the price
 	 */
-	public float getPrice() {
+	public long getPrice() {
 		return price;
 	}
 	/**
 	 * @param price the price to set
 	 */
-	public void setPrice(float price) {
+	public void setPrice(long price) {
 		this.price = price;
 	}
 	/**
 	 * @return the buyerId
 	 */
-	public String getBuyerId() {
+	public long getBuyerId() {
 		return buyerId;
 	}
 	/**
 	 * @param buyerId the buyerId to set
 	 */
-	public void setBuyerId(String buyerId) {
+	public void setBuyerId(long buyerId) {
 		this.buyerId = buyerId;
 	}
 	/**
 	 * @return the sellerId
 	 */
-	public String getSellerId() {
+	public long getSellerId() {
 		return sellerId;
 	}
 	/**
 	 * @param sellerId the sellerId to set
 	 */
-	public void setSellerId(String sellerId) {
+	public void setSellerId(long sellerId) {
 		this.sellerId = sellerId;
 	}
-};
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
 
+	public int hashCode() {
+		final int prime = 31;
+		int result = 17;
+		result = prime * result + (int) (tradeId ^ (tradeId >>> 32));
+		return result;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj){
+			return true;
+		}
+		if (obj == null){
+			return false;
+		}
+		if (!(obj instanceof Trade)){
+			return false;
+		}
+		Trade other = (Trade) obj;
+		if (tradeId != other.tradeId){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Trade [tradeId=" + tradeId + ", tradeTime=" + tradeTime
+				+ ", qty=" + qty + ", price=" + price + ", buyerId=" + buyerId
+				+ ", sellerId=" + sellerId + "]";
+	}
+	
+};
